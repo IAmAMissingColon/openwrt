@@ -3,7 +3,7 @@ include $(INCLUDE_DIR)/image.mk
 
 KERNEL_LOADADDR = 0x80060000
 
-DEVICE_VARS += IMAGE_SIZE LOADER_FLASH_OFFS LOADER_TYPE ATH_SOC
+DEVICE_VARS += IMAGE_SIZE LOADER_FLASH_OFFS LOADER_TYPE
 
 define Build/loader-common
 	rm -rf $@.src
@@ -36,6 +36,10 @@ define Build/loader-okli
 	mv "$@.new" "$@"
 endef
 
+define Build/append-loader-okli
+	cat "$(KDIR)/loader-$(word 1,$(1)).$(LOADER_TYPE)" >> "$@"
+endef
+
 define Build/relocate-kernel
 	rm -rf $@.relocate
 	$(CP) ../../generic/image/relocate $@.relocate
@@ -51,9 +55,8 @@ endef
 
 
 define Device/Default
-  ATH_SOC :=
   DEVICE_DTS_DIR := ../dts
-  DEVICE_DTS = $$(ATH_SOC)_$(1)
+  DEVICE_DTS = $$(SOC)_$(1)
   PROFILES = Default
   MTDPARTS :=
   BLOCKSIZE := 64k

@@ -2,7 +2,7 @@ https://sourceware.org/bugzilla/show_bug.cgi?id=21002
 
 --- a/lib/system.h
 +++ b/lib/system.h
-@@ -30,7 +30,16 @@
+@@ -30,7 +30,18 @@
  #define LIB_SYSTEM_H	1
  
  #include <errno.h>
@@ -12,15 +12,17 @@ https://sourceware.org/bugzilla/show_bug.cgi?id=21002
 +#else
 +#include "err.h"
 +#include <stdio.h>
-+#define error(status, errno, ...) \
-+	fflush(stdout); \
-+	warn(__VA_ARGS__); \
-+	if (status) exit(status)
++#define error(status, errno, ...) 		\
++	do {					\
++		fflush(stdout); 		\
++		warn(__VA_ARGS__);		\
++		if (status) exit(status);	\
++	 } while(0)
 +#endif
  #include <stddef.h>
  #include <stdint.h>
  #include <sys/param.h>
-@@ -38,6 +47,10 @@
+@@ -38,6 +49,10 @@
  #include <byteswap.h>
  #include <unistd.h>
  
@@ -42,21 +44,12 @@ https://sourceware.org/bugzilla/show_bug.cgi?id=21002
  }
 --- a/libdwfl/dwfl_error.c
 +++ b/libdwfl/dwfl_error.c
-@@ -140,6 +140,7 @@ __libdwfl_seterrno (Dwfl_Error error)
- const char *
- dwfl_errmsg (int error)
- {
-+  static __thread char s[64] = "";
-   if (error == 0 || error == -1)
-     {
-       int last_error = global_error;
-@@ -154,7 +155,8 @@ dwfl_errmsg (int error)
+@@ -154,7 +154,7 @@ dwfl_errmsg (int error)
    switch (error &~ 0xffff)
      {
      case OTHER_ERROR (ERRNO):
 -      return strerror_r (error & 0xffff, "bad", 0);
-+      strerror_r (error & 0xffff, s, sizeof(s));
-+      return s;
++      return strerror_l (error & 0xffff, LC_GLOBAL_LOCALE);
      case OTHER_ERROR (LIBELF):
        return elf_errmsg (error & 0xffff);
      case OTHER_ERROR (LIBDW):

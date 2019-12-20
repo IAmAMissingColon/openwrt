@@ -6,7 +6,7 @@
 #include "ar9344.dtsi"
 
 / {
-	compatible = "ubnt,wa", "qca,ar9344";
+	compatible = "ubnt,wa", "qca,ar9342";
 	model = "Ubiquiti Networks WA board";
 
 	keys {
@@ -64,6 +64,7 @@
 			};
 
 			partition@50000 {
+				compatible = "denx,uimage";
 				label = "firmware";
 				reg = <0x050000 0xf60000>;
 			};
@@ -74,8 +75,8 @@
 				read-only;
 			};
 
-			eeprom: partition@ff0000 {
-				label = "EEPROM";
+			art: partition@ff0000 {
+				label = "art";
 				reg = <0xff0000 0x010000>;
 				read-only;
 			};
@@ -87,6 +88,5 @@
 	status = "okay";
 
 	qca,disable-5ghz;
-	mtd-cal-data = <&eeprom 0x1000>;
-	mtd-mac-address = <&eeprom 0x1002>;
+	mtd-cal-data = <&art 0x1000>;
 };

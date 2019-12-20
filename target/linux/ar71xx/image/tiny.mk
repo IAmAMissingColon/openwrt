@@ -1,3 +1,12 @@
+define Build/mkbuffaloimg
+	$(STAGING_DIR_HOST)/bin/mkbuffaloimg -B $(BOARDNAME) \
+		-R $$(($(subst k, * 1024,$(ROOTFS_SIZE)))) \
+		-K $$(($(subst k, * 1024,$(KERNEL_SIZE)))) \
+		-i $@ -o $@.new
+	mv $@.new $@
+endef
+
+
 define Device/bhr-4grv2
   DEVICE_TITLE := Buffalo BHR-4GRV2
   BOARDNAME := BHR-4GRV2
@@ -12,7 +21,7 @@ endef
 
 define Device/zbt-we1526
   DEVICE_TITLE := Zbtlink ZBT-WE1526
-  DEVICE_PACKAGES := kmod-usb-core kmod-usb2
+  DEVICE_PACKAGES := kmod-usb2
   BOARDNAME := ZBT-WE1526
   IMAGE_SIZE := 16000k
   KERNEL_SIZE := 1472k
